@@ -1,50 +1,94 @@
 #!/bin/bash
 
-USERID=$(id -u)
+USERID=(id -u)
 
-VALIDATE(){
-if [ $1 -ne 0 ]; then
-	echo "$2 ... FAILURE"
-	exit 1
-else
-	echo "$2 ... SUCCESS"
-fi
-}
+#check the user id is root or not
 
 if [ $USERID -ne 0 ]; then
-	echo "You need to be root user to execute this script"
-	exit 1
+   echo" you need to be a root user to execute script"
+   exit 1
 fi
 
-yum update –y
+yum update -y
 
-VALIDATE $? "Updating YUM"
+if [ $? -ne 0 ]; then
+  echo" installing yum update is failure"
+  exit 1
+else
+  echo" installing yum update is success"
+fi
 
-wget -O /etc/yum.repos.d/jenkins.repo \
+ sudo wget -O /etc/yum.repos.d/jenkins.repo \
     https://pkg.jenkins.io/redhat-stable/jenkins.repo
+	
 
-VALIDATE $? "Adding Jenkins Repo"
+if [ $? -ne 0 ]; then
+  echo" installing jenkins repo is failure"
+  exit 1
+else
+  echo" installing jenkins repo is success"
+fi
 
-rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 
-VALIDATE $? "Import Jenkin key"
+if [ $? -ne 0 ]; then
+  echo" installing jenkins key is failure"
+  exit 1
+else
+  echo" installing jenkins is success"
+fi
 
-yum upgrade -y
+sudo yum upgrade
 
-VALIDATE $? "Upgrade YUM"
+if [ $? -ne 0 ]; then
+  echo" installing upgrade is failure"
+  exit 1
+else
+  echo" installing upgrade is success"
+fi
 
-amazon-linux-extras install java-openjdk11 -y
+sudo dnf install java-17-amazon-corretto -y
 
-VALIDATE $? "Installing OpenJDK 11"
+if [ $? -ne 0 ]; then
+  echo" installing java is failure"
+  exit 1
+else
+  echo" installing java is success"
+fi
 
-yum install jenkins -y
+sudo yum install jenkins -y
 
-VALIDATE $? "Installing Jenkins"
+if [ $? -ne 0 ]; then
+  echo" installing jenkins is failure"
+  exit 1
+else
+  echo" installing jenkins is success"
+fi
 
-systemctl enable jenkins
+sudo systemctl enable jenkins
 
-VALIDATE $? "Enable Jenkins"
+if [ $? -ne 0 ]; then
+  echo" enable jenkins is failure"
+  exit 1
+else
+  echo" enable jenkins is success"
+fi
 
-systemctl start jenkins
+sudo systemctl start jenkins
 
-VALIDATE $? "Starting Jenkins"
+if [ $? -ne 0 ]; then
+  echo" start jenkins is failure"
+  exit 1
+else
+  echo" start jenkins is success"
+fi
+
+sudo systemctl status jenkins
+
+if [ $? -ne 0 ]; then
+  echo" status jenkins is failure"
+  exit 1
+else
+  echo" status jenkins is success"
+fi
+
